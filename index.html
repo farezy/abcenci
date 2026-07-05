@@ -5,204 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#10233F">
 <title>Absensi Kehadiran</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #10233F;
-    --navy-2: #16304F;
-    --teal: #0EA5A0;
-    --teal-dark: #0B8580;
-    --bg: #F4F7FA;
-    --card: #FFFFFF;
-    --border: #E8EEF3;
-    --text: #2D3748;
-    --muted: #718096;
-    --danger: #E53E3E;
-    --danger-bg: #FFF5F5;
-    --success: #38A169;
-    --success-bg: #F0FFF4;
-    --radius: 20px;
-    --radius-sm: 12px;
+    --navy: #10233F; --navy-2: #16304F; --teal: #0EA5A0; --teal-dark: #0B8580;
+    --bg: #F4F7FA; --card: #FFFFFF; --border: #E8EEF3; --text: #2D3748;
+    --muted: #718096; --danger: #E53E3E; --danger-bg: #FFF5F5;
+    --success: #38A169; --success-bg: #F0FFF4;
+    --radius: 20px; --radius-sm: 12px;
     --shadow: 0 4px 20px rgba(16, 35, 63, 0.05);
   }
-  
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    padding-bottom: 40px;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* --- STICKY MODERN TOPBAR --- */
-  .topbar {
-    background: rgba(16, 35, 63, 0.95);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: #fff;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; padding-bottom: 40px; -webkit-tap-highlight-color: transparent; }
+  .topbar { background: rgba(16, 35, 63, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; padding: 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
   .brand { display: flex; align-items: center; gap: 12px; }
-  .brand-mark {
-    width: 40px; height: 40px; border-radius: 12px;
-    background: var(--teal);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Sora', sans-serif; font-weight: 800; font-size: 18px; color: var(--navy);
-  }
-  .brand h1 {
-    font-family: 'Sora', sans-serif;
-    font-size: 16px; font-weight: 700; margin: 0;
-  }
+  .brand-mark { width: 40px; height: 40px; border-radius: 12px; background: var(--teal); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 18px; color: var(--navy); }
+  .brand h1 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; margin: 0; }
   .brand p { margin: 2px 0 0; font-size: 11px; color: #B9C6D6; }
-  
   .clock { text-align: right; font-family: 'IBM Plex Mono', monospace; }
   .clock .time { font-size: 16px; font-weight: 600; }
-  .window-badge {
-    display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;
-    padding: 4px 8px; border-radius: 999px; font-size: 10px; font-weight: 700;
-    background: rgba(30,138,99,0.2); color: #8FE3C0;
-  }
+  .window-badge { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 4px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; background: rgba(30,138,99,0.2); color: #8FE3C0; }
   .window-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-
-  /* --- LAYOUT WRAPPER --- */
-  .wrap {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  @media (min-width: 900px) {
-    .wrap { flex-direction: row; align-items: flex-start; max-width: 1200px; }
-    .form-section { width: 400px; flex-shrink: 0; position: sticky; top: 90px; }
-    .data-section { flex-grow: 1; min-width: 0; }
-  }
-
-  /* --- CARDS --- */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 20px;
-  }
+  .wrap { padding: 16px; display: flex; flex-direction: column; gap: 20px; max-width: 800px; margin: 0 auto; }
+  @media (min-width: 900px) { .wrap { flex-direction: row; align-items: flex-start; max-width: 1200px; } .form-section { width: 400px; flex-shrink: 0; position: sticky; top: 90px; } .data-section { flex-grow: 1; min-width: 0; } }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
   .card h2 { font-family: 'Sora', sans-serif; font-size: 18px; margin: 0 0 4px; font-weight: 700; }
   .card .sub { font-size: 12px; color: var(--muted); margin: 0 0 20px; }
-
-  /* --- FORMS (TOUCH FRIENDLY) --- */
-  label {
-    display: block; font-size: 12px; font-weight: 600; color: var(--navy);
-    margin-bottom: 6px; margin-top: 16px;
-  }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--navy); margin-bottom: 6px; margin-top: 16px; }
   label:first-of-type { margin-top: 0; }
-  
-  input[type=text], input[type=time], select {
-    width: 100%; padding: 14px 16px; border-radius: var(--radius-sm);
-    border: 1.5px solid var(--border); font-size: 14px; font-family: 'Inter', sans-serif;
-    background: #F8FAFC; color: var(--text); transition: all 0.2s;
-    appearance: none; /* Modern look */
-  }
-  input[type=text]:focus, input[type=time]:focus, select:focus {
-    outline: none; border-color: var(--teal); background: #fff;
-    box-shadow: 0 0 0 3px rgba(14, 165, 160, 0.15);
-  }
+  input[type=text], input[type=time], select { width: 100%; padding: 14px 16px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); font-size: 14px; font-family: 'Inter', sans-serif; background: #F8FAFC; color: var(--text); transition: all 0.2s; appearance: none; }
+  input[type=text]:focus, input[type=time]:focus, select:focus { outline: none; border-color: var(--teal); background: #fff; box-shadow: 0 0 0 3px rgba(14, 165, 160, 0.15); }
   input#nik { font-family: 'IBM Plex Mono', monospace; }
-
-  .sign-box {
-    margin-top: 8px; border: 1.5px dashed #CBD5E0; border-radius: var(--radius-sm);
-    background: #F8FAFC; position: relative; overflow: hidden;
-  }
+  .sign-box { margin-top: 8px; border: 1.5px dashed #CBD5E0; border-radius: var(--radius-sm); background: #F8FAFC; position: relative; overflow: hidden; }
   .sign-box canvas { display: block; width: 100%; height: 160px; touch-action: none; cursor: crosshair; }
-  
   .sign-tools { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
   .sign-hint { font-size: 11px; color: var(--muted); }
-  
-  /* --- BUTTONS --- */
-  .btn {
-    width: 100%; margin-top: 24px; padding: 16px; border: none; border-radius: var(--radius-sm);
-    background: var(--teal); color: #fff; font-weight: 700; font-size: 15px;
-    font-family: 'Sora', sans-serif; cursor: pointer; transition: 0.2s;
-    display: flex; justify-content: center; align-items: center; gap: 8px;
-  }
+  .btn { width: 100%; margin-top: 24px; padding: 16px; border: none; border-radius: var(--radius-sm); background: var(--teal); color: #fff; font-weight: 700; font-size: 15px; font-family: 'Sora', sans-serif; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
   .btn:active { transform: scale(0.98); }
   .btn.secondary { background: #fff; color: var(--navy); border: 1.5px solid var(--border); margin-top: 12px; }
   .link-btn { background: none; border: none; color: var(--danger); font-size: 12px; font-weight: 600; cursor: pointer; padding: 4px; }
-
-  /* --- STATS GRID --- */
-  .stats {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;
-  }
+  .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
   .stat { padding: 16px; text-align: center; border-radius: var(--radius-sm); }
   .stat:last-child { grid-column: span 2; }
-  @media (min-width: 600px) {
-    .stats { grid-template-columns: repeat(3, 1fr); }
-    .stat:last-child { grid-column: span 1; }
-  }
+  @media (min-width: 600px) { .stats { grid-template-columns: repeat(3, 1fr); } .stat:last-child { grid-column: span 1; } }
   .stat .label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
   .stat .value { font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; color: var(--navy); margin-top: 4px; }
   .stat .value.teal { color: var(--teal); }
-
-  /* --- DATA TABLE --- */
   .table-head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
   .controls { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-  
-  @media (min-width: 600px) {
-    .table-head { flex-direction: row; justify-content: space-between; align-items: center; }
-    .controls { flex-direction: row; width: auto; }
-  }
-
+  @media (min-width: 600px) { .table-head { flex-direction: row; justify-content: space-between; align-items: center; } .controls { flex-direction: row; width: auto; } }
   .search-wrap { position: relative; width: 100%; }
   .search-wrap input { padding-left: 36px; padding-top: 12px; padding-bottom: 12px; }
   .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
-
-  .export-btn {
-    padding: 12px 16px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: #fff;
-    color: var(--navy); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; justify-content: center;
-  }
-
+  .export-btn { padding: 12px 16px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: #fff; color: var(--navy); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; justify-content: center; }
   .table-scroll { overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px; }
   thead th { text-align: left; font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 12px; border-bottom: 2px solid var(--border); }
   tbody td { padding: 14px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  
   .nik-cell { font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
   .dept-pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; background: #EBF4FF; color: #3182CE; }
   .paraf-img { height: 30px; max-width: 80px; object-fit: contain; }
-  
   .row-actions { display: flex; gap: 8px; }
   .icon-btn { border: none; background: #F8FAFC; cursor: pointer; padding: 8px; border-radius: 8px; color: var(--muted); display: flex; }
   .icon-btn.del { color: var(--danger); }
-
-  .status-pill {
-    display: inline-flex; padding: 4px 10px; border-radius: 999px;
-    font-size: 11px; font-weight: 700; background: var(--success-bg); color: var(--success);
-  }
+  .status-pill { display: inline-flex; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--success-bg); color: var(--success); }
   .status-pill.late { background: var(--danger-bg); color: var(--danger); }
-
   .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
   .empty-state svg { opacity: 0.3; margin-bottom: 12px; }
-  
-  /* --- TOAST --- */
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
-    background: var(--navy); color: #fff; padding: 14px 24px; border-radius: 100px; font-size: 13px;
-    font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0; pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000;
-  }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--navy); color: #fff; padding: 14px 24px; border-radius: 100px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
   footer { text-align: center; padding: 20px; color: var(--muted); font-size: 11px; }
 </style>
 </head>
@@ -223,12 +102,10 @@
 </div>
 
 <div class="wrap">
-  
   <div class="form-section">
     <div class="card">
       <h2 id="formTitle">Isi Kehadiran</h2>
       <p class="sub">Lengkapi data peserta di bawah ini.</p>
-
       <form id="absenForm">
         <label for="nama">Nama Lengkap</label>
         <input type="text" id="nama" placeholder="Siti Rahmawati" autocomplete="off" required>
@@ -308,7 +185,6 @@
           </button>
         </div>
       </div>
-
       <div class="table-scroll">
         <table>
           <thead>
@@ -326,26 +202,32 @@
           <tbody id="tableBody"></tbody>
         </table>
       </div>
-      
       <div class="empty-state" id="emptyState">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-6 4h6M9 8h1M4 6a2 2 0 012-2h12a2 2 0 012 2v14l-4-3-3 3-3-3-3 3-3-3V6z"/></svg>
         <p style="margin:0; font-size:13px;">Belum ada data kehadiran.</p>
       </div>
     </div>
   </div>
-
 </div>
 
 <footer>Aplikasi tersimpan offline di browser Anda.</footer>
 <div class="toast" id="toast"></div>
 
 <script>
+// Pendaftaran Service Worker untuk fitur Instalasi (PWA)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(registration => console.log('ServiceWorker sukses didaftarkan:', registration.scope))
+      .catch(error => console.log('ServiceWorker gagal didaftarkan:', error));
+  });
+}
+
 (function(){
   const STORAGE_KEY = 'absensi_records_v1';
   let records = [];
   let editId = null;
 
-  // ---------- Jadwal Shift Kerja ----------
   const SHIFTS = {
     'Shift 1': { start: '07:00', end: '15:30' },
     'Shift 2': { start: '15:00', end: '23:30' },
@@ -383,7 +265,6 @@
     return '';
   }
 
-  // ---------- Clock ----------
   function pad(n){return n.toString().padStart(2,'0');}
   function updateClock(){
     const now = new Date();
@@ -392,7 +273,6 @@
   updateClock();
   setInterval(updateClock, 1000);
 
-  // ---------- Storage ----------
   function load(){
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -408,7 +288,6 @@
     catch(e) { showToast('Gagal menyimpan data', true); }
   }
 
-  // ---------- Notifikasi Telegram (HARDCODED) ----------
   function loadTgConfig(){
     return {
       token: '8917311443:AAF5dA4mY9spm23180xLMkMupdmU-Dw_paM',
@@ -434,7 +313,6 @@
     sendTelegramMessage(buildAttendanceMessage(action, rec));
   }
 
-  // ---------- Signature Pad ----------
   const canvas = document.getElementById('signPad');
   const ctx = canvas.getContext('2d');
   let drawing = false, hasSignature = false;
@@ -466,21 +344,12 @@
     }
     return {x: e.clientX - rect.left, y: e.clientY - rect.top};
   }
-  function start(e){
-    e.preventDefault();
-    drawing = true;
-    last = pos(e);
-  }
+  function start(e){ e.preventDefault(); drawing = true; last = pos(e); }
   function move(e){
-    if(!drawing) return;
-    e.preventDefault();
+    if(!drawing) return; e.preventDefault();
     const p = pos(e);
-    ctx.beginPath();
-    ctx.moveTo(last.x, last.y);
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
-    last = p;
-    hasSignature = true;
+    ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+    last = p; hasSignature = true;
   }
   function end(){ drawing = false; }
 
@@ -492,14 +361,12 @@
   canvas.addEventListener('touchend', end);
 
   document.getElementById('clearSign').addEventListener('click', ()=>{
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    hasSignature = false;
+    ctx.clearRect(0,0,canvas.width,canvas.height); hasSignature = false;
   });
 
   function getSignatureData(){ return hasSignature ? canvas.toDataURL('image/png') : ''; }
   function setSignatureData(dataUrl){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    hasSignature = false;
+    ctx.clearRect(0,0,canvas.width,canvas.height); hasSignature = false;
     if(dataUrl){
       const img = new Image();
       img.onload = ()=>{
@@ -511,25 +378,19 @@
     }
   }
 
-  // ---------- Toast ----------
   let toastTimer;
   function showToast(msg, isErr){
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show' + (isErr ? ' err' : '');
+    t.textContent = msg; t.className = 'toast show' + (isErr ? ' err' : '');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(()=> t.className = 'toast', 2500);
   }
 
-  // ---------- Form & Logic ----------
   const form = document.getElementById('absenForm');
   const formEls = {
-    nama: document.getElementById('nama'),
-    nik: document.getElementById('nik'),
-    dept: document.getElementById('departemen'),
-    trainer: document.getElementById('trainer'),
-    shift: document.getElementById('shift'),
-    jam: document.getElementById('jamManual')
+    nama: document.getElementById('nama'), nik: document.getElementById('nik'),
+    dept: document.getElementById('departemen'), trainer: document.getElementById('trainer'),
+    shift: document.getElementById('shift'), jam: document.getElementById('jamManual')
   };
   const submitBtn = document.getElementById('submitBtn');
   const cancelBtn = document.getElementById('cancelEdit');
@@ -537,20 +398,13 @@
 
   form.addEventListener('submit', function(e){
     e.preventDefault();
-
     const data = {
-      nama: formEls.nama.value.trim(),
-      nik: formEls.nik.value.trim(),
-      dept: formEls.dept.value,
-      trainer: formEls.trainer.value.trim(),
-      shift: formEls.shift.value,
-      jamManual: formEls.jam.value
+      nama: formEls.nama.value.trim(), nik: formEls.nik.value.trim(),
+      dept: formEls.dept.value, trainer: formEls.trainer.value.trim(),
+      shift: formEls.shift.value, jamManual: formEls.jam.value
     };
 
-    if(Object.values(data).some(v => !v)){
-      showToast('Mohon lengkapi semua kolom', true);
-      return;
-    }
+    if(Object.values(data).some(v => !v)){ showToast('Mohon lengkapi semua kolom', true); return; }
 
     const now = new Date();
     data.late = isLateForShift(data.shift, data.jamManual);
@@ -563,30 +417,24 @@
         notifyTelegram('Diperbarui', rec);
       }
       showToast('Data diperbarui');
-      editId = null;
-      submitBtn.textContent = 'Simpan Kehadiran';
-      cancelBtn.style.display = 'none';
-      formTitle.textContent = 'Isi Kehadiran';
+      editId = null; submitBtn.textContent = 'Simpan Kehadiran';
+      cancelBtn.style.display = 'none'; formTitle.textContent = 'Isi Kehadiran';
     } else {
       const newRec = {
         id: 'r'+Date.now()+Math.random().toString(36).slice(2,6),
-        ...data,
-        paraf: getSignatureData(),
-        time: now.toISOString()
+        ...data, paraf: getSignatureData(), time: now.toISOString()
       };
       records.unshift(newRec);
       notifyTelegram('Baru', newRec);
       showToast('Kehadiran tersimpan');
     }
 
-    save(); render(); form.reset();
-    setSignatureData(''); setDefaultJamManual();
+    save(); render(); form.reset(); setSignatureData(''); setDefaultJamManual();
   });
 
   cancelBtn.addEventListener('click', ()=>{
     editId = null; form.reset(); setSignatureData(''); setDefaultJamManual();
-    submitBtn.textContent = 'Simpan Kehadiran';
-    cancelBtn.style.display = 'none';
+    submitBtn.textContent = 'Simpan Kehadiran'; cancelBtn.style.display = 'none';
     formTitle.textContent = 'Isi Kehadiran';
   });
 
@@ -604,12 +452,9 @@
     formEls.nama.value = rec.nama; formEls.nik.value = rec.nik;
     formEls.dept.value = rec.dept; formEls.trainer.value = rec.trainer;
     formEls.shift.value = rec.shift || ''; formEls.jam.value = rec.jamManual || '';
-    setSignatureData(rec.paraf);
-    editId = id;
-    submitBtn.textContent = 'Perbarui Kehadiran';
-    cancelBtn.style.display = 'flex';
-    formTitle.textContent = 'Edit Kehadiran';
-    window.scrollTo({top:0, behavior:'smooth'});
+    setSignatureData(rec.paraf); editId = id;
+    submitBtn.textContent = 'Perbarui Kehadiran'; cancelBtn.style.display = 'flex';
+    formTitle.textContent = 'Edit Kehadiran'; window.scrollTo({top:0, behavior:'smooth'});
   };
 
   window.deleteRecord = function(id){
@@ -644,13 +489,11 @@
   function render(){
     const q = searchBox.value.trim().toLowerCase();
     let filtered = records.filter(r => !q || r.nama.toLowerCase().includes(q) || r.nik.toLowerCase().includes(q));
-
     const tbody = document.getElementById('tableBody');
     const emptyState = document.getElementById('emptyState');
 
     if(filtered.length === 0){
-      tbody.innerHTML = '';
-      emptyState.style.display = 'block';
+      tbody.innerHTML = ''; emptyState.style.display = 'block';
     } else {
       emptyState.style.display = 'none';
       tbody.innerHTML = filtered.map(r=>{
@@ -680,7 +523,6 @@
     document.getElementById('statTotal').textContent = records.length;
     document.getElementById('statDept').textContent = [...new Set(records.map(r=>r.dept))].length;
   }
-
   load(); render();
 })();
 </script>
