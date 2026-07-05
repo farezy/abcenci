@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absensi Kehadiran</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #10233F;
+    --navy-2: #16304F;
+    --teal: #0EA5A0;
+    --teal-dark: #0B8580;
+    --bg: #F3F6F9;
+    --card: #FFFFFF;
+    --border: #E3E9EF;
+    --text: #1F2937;
+    --muted: #6B7686;
+    --danger: #C6533F;
+    --danger-bg: #FBEAE7;
+    --success: #1E8A63;
+    --success-bg: #E7F5EF;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(16,35,63,0.04), 0 8px 24px -12px rgba(16,35,63,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  .topbar{
+    background:linear-gradient(135deg,var(--navy) 0%, var(--navy-2) 100%);
+    color:#fff;
+    padding:22px clamp(16px,4vw,48px);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+    position:relative;
+    overflow:hidden;
+  }
+  .topbar::after{
+    content:"";
+    position:absolute;
+    right:-60px; top:-60px;
+    width:220px;height:220px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(14,165,160,0.35), transparent 70%);
+  }
+  .brand{display:flex;align-items:center;gap:14px;position:relative;z-index:1;}
+  .brand-mark{
+    width:44px;height:44px;border-radius:11px;
+    background:var(--teal);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Sora',sans-serif; font-weight:800; font-size:18px; color:var(--navy);
+    flex-shrink:0;
+  }
+  .brand h1{
+    font-family:'Sora',sans-serif;
+    font-size:19px; font-weight:700; margin:0; letter-spacing:0.2px;
+  }
+  .brand p{margin:2px 0 0; font-size:12.5px; color:#B9C6D6;}
+  .clock{
+    text-align:right; position:relative; z-index:1;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .clock .time{font-size:22px; font-weight:600; letter-spacing:1px;}
+  .clock .date{font-size:12.5px; color:#B9C6D6; margin-top:2px;}
+  .window-badge{
+    display:inline-flex; align-items:center; gap:6px; margin-top:8px;
+    padding:4px 10px; border-radius:999px; font-size:11.5px; font-weight:700;
+    background:rgba(30,138,99,0.18); color:#8FE3C0;
+  }
+  .window-badge.closed{background:rgba(198,83,63,0.2); color:#F3B3A6;}
+  .window-badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+  .closed-banner{display:none;}
+
+  .wrap{
+    max-width:1280px;
+    margin:0 auto;
+    padding:clamp(16px,3vw,32px);
+    display:grid;
+    grid-template-columns:360px 1fr;
+    gap:24px;
+    align-items:start;
+  }
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr;}
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+
+  .form-card{padding:22px 22px 24px; position:sticky; top:20px;}
+  .form-card h2{
+    font-family:'Sora',sans-serif; font-size:16px; margin:0 0 4px; font-weight:700;
+  }
+  .form-card .sub{font-size:12.5px; color:var(--muted); margin:0 0 18px;}
+
+  label{
+    display:block; font-size:12.5px; font-weight:600; color:var(--navy);
+    margin-bottom:6px; margin-top:14px;
+  }
+  label:first-of-type{margin-top:0;}
+  input[type=text], select{
+    width:100%; padding:10px 12px; border-radius:10px;
+    border:1.5px solid var(--border); font-size:14px; font-family:'Inter',sans-serif;
+    background:#FAFBFC; color:var(--text); transition:border-color .15s, background .15s;
+  }
+  input[type=text]:focus, select:focus{
+    outline:none; border-color:var(--teal); background:#fff;
+  }
+  input#nik{font-family:'IBM Plex Mono',monospace; letter-spacing:0.5px;}
+
+  .sign-box{
+    margin-top:8px; border:1.5px dashed var(--border); border-radius:10px;
+    background:#FAFBFC; position:relative; overflow:hidden;
+  }
+  .sign-box canvas{display:block; width:100%; height:140px; touch-action:none; cursor:crosshair;}
+  .sign-tools{display:flex; justify-content:space-between; align-items:center; margin-top:8px;}
+  .sign-hint{font-size:11.5px; color:var(--muted);}
+  .link-btn{
+    background:none; border:none; color:var(--teal-dark); font-size:12.5px; font-weight:600;
+    cursor:pointer; padding:2px 4px;
+  }
+  .link-btn:hover{text-decoration:underline;}
+
+  .btn{
+    width:100%; margin-top:20px; padding:12px 16px; border:none; border-radius:10px;
+    background:var(--teal); color:#fff; font-weight:700; font-size:14.5px;
+    font-family:'Sora',sans-serif; cursor:pointer; transition:background .15s, transform .05s;
+  }
+  .btn:hover{background:var(--teal-dark);}
+  .btn:active{transform:scale(0.99);}
+  .btn.secondary{
+    background:#fff; color:var(--navy); border:1.5px solid var(--border); margin-top:8px;
+  }
+  .btn.secondary:hover{border-color:var(--navy);}
+
+  .stats{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px;
+  }
+  @media (max-width:560px){.stats{grid-template-columns:1fr;}}
+  .stat{padding:18px 18px; }
+  .stat .label{font-size:12px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.4px;}
+  .stat .value{font-family:'Sora',sans-serif; font-size:28px; font-weight:800; color:var(--navy); margin-top:6px;}
+  .stat .value.teal{color:var(--teal-dark);}
+
+  .table-card{padding:20px 20px 8px;}
+  .table-head{
+    display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .table-head h2{font-family:'Sora',sans-serif; font-size:16px; margin:0; font-weight:700;}
+  .controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  .controls input, .controls select{width:auto; min-width:150px;}
+  .search-wrap{position:relative;}
+  .search-wrap input{padding-left:32px;}
+  .search-wrap svg{position:absolute; left:10px; top:50%; transform:translateY(-50%); opacity:0.45;}
+
+  .export-btn{
+    padding:9px 14px; border-radius:9px; border:1.5px solid var(--border); background:#fff;
+    color:var(--navy); font-weight:600; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;
+  }
+  .export-btn:hover{border-color:var(--teal);}
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  thead th{
+    text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:0.4px;
+    color:var(--muted); font-weight:700; padding:10px 12px; border-bottom:2px solid var(--border);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:12px 12px; border-bottom:1px solid var(--border); vertical-align:middle;
+  }
+  tbody tr:hover{background:#F8FAFC;}
+  .nik-cell{font-family:'IBM Plex Mono',monospace; color:var(--navy); font-size:12.5px;}
+  .dept-pill{
+    display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600;
+    background:#EAF2FE; color:#1E4E8C;
+  }
+  .paraf-img{height:34px; max-width:90px; object-fit:contain;}
+  .paraf-empty{color:var(--muted); font-size:12px; font-style:italic;}
+  .row-actions{display:flex; gap:6px;}
+  .icon-btn{
+    border:none; background:none; cursor:pointer; padding:6px; border-radius:7px; color:var(--muted);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .icon-btn:hover{background:var(--border); color:var(--navy);}
+  .icon-btn.del:hover{background:var(--danger-bg); color:var(--danger);}
+  .status-pill{
+    display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px;
+    font-size:12px; font-weight:700; background:var(--success-bg); color:var(--success);
+  }
+  .status-pill.late{background:#FFF3E0; color:#B5680B;}
+
+  .empty-state{
+    text-align:center; padding:48px 20px; color:var(--muted);
+  }
+  .empty-state svg{opacity:0.35; margin-bottom:12px;}
+  .empty-state p{margin:4px 0 0; font-size:13.5px;}
+
+  .table-scroll{overflow-x:auto; padding-bottom:14px;}
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--navy); color:#fff; padding:12px 20px; border-radius:10px; font-size:13.5px;
+    font-weight:600; box-shadow:0 10px 30px -8px rgba(0,0,0,0.4); opacity:0; pointer-events:none;
+    transition:all .25s ease; z-index:100; display:flex; align-items:center; gap:8px;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast.err{background:var(--danger);}
+
+  footer{
+    text-align:center; padding:24px; color:var(--muted); font-size:12px;
+  }
+
+  .settings-btn{
+    width:38px; height:38px; border-radius:10px; border:1.5px solid rgba(255,255,255,0.25);
+    background:rgba(255,255,255,0.08); color:#fff; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; transition:background .15s, transform .3s;
+  }
+  .settings-btn:hover{background:rgba(255,255,255,0.18); transform:rotate(20deg);}
+
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(16,35,63,0.45);
+    align-items:center; justify-content:center; z-index:200; padding:16px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:#fff; border-radius:16px; padding:26px 26px 22px; width:100%; max-width:420px;
+    box-shadow:0 20px 60px -12px rgba(16,35,63,0.35);
+  }
+  .modal-box h3{font-family:'Sora',sans-serif; font-size:17px; margin:0 0 6px; font-weight:700; color:var(--navy);}
+  .modal-sub{font-size:12.5px; color:var(--muted); margin:0 0 18px; line-height:1.5;}
+  .modal-box label{display:block; font-size:12.5px; font-weight:600; color:var(--navy); margin-bottom:6px; margin-top:14px;}
+  .modal-box label:first-of-type{margin-top:0;}
+  .modal-box input{
+    width:100%; padding:10px 12px; border-radius:10px; border:1.5px solid var(--border);
+    font-size:13.5px; font-family:'IBM Plex Mono',monospace; background:#FAFBFC;
+  }
+  .modal-box input:focus{outline:none; border-color:var(--teal); background:#fff;}
+  .modal-status{font-size:12.5px; margin-top:12px; min-height:18px; font-weight:600;}
+  .modal-status.ok{color:var(--success);}
+  .modal-status.err{color:var(--danger);}
+  .modal-actions{display:flex; gap:10px; margin-top:18px;}
+  .modal-actions .btn{margin-top:0;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">A</div>
+    <div>
+      <h1>Absensi Kehadiran</h1>
+      <p>Pelatihan &amp; Training Internal</p>
+    </div>
+  </div>
+  <div style="display:flex; align-items:center; gap:16px; position:relative; z-index:1;">
+    <div class="clock">
+      <div class="time" id="clockTime">--:--:--</div>
+      <div class="date" id="clockDate">--</div>
+      <div class="window-badge" id="windowBadge"><span class="dot"></span><span id="windowBadgeText">Absensi Dibuka</span></div>
+    </div>
+    <button id="settingsBtn" class="settings-btn" title="Pengaturan Notifikasi Telegram">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-box">
+    <h3>Pengaturan Notifikasi Telegram</h3>
+    <p class="modal-sub">Notifikasi akan dikirim otomatis saat ada data baru, diedit, atau dihapus.</p>
+
+    <label for="tgToken">Bot Token</label>
+    <input type="text" id="tgToken" placeholder="cth. 123456789:ABC-defGhIJKlmNoPQR">
+
+    <label for="tgChatId">Chat ID</label>
+    <input type="text" id="tgChatId" placeholder="cth. 123456789">
+
+    <div class="modal-status" id="tgStatus"></div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn secondary" id="tgTestBtn">Kirim Tes</button>
+      <button type="button" class="btn" id="tgSaveBtn">Simpan</button>
+    </div>
+    <button type="button" class="link-btn" id="tgCloseBtn" style="margin-top:10px;">Tutup</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- FORM -->
+  <div class="card form-card">
+    <h2 id="formTitle">Isi Kehadiran</h2>
+    <p class="sub">Lengkapi data peserta di bawah ini.</p>
+
+    <form id="absenForm">
+      <label for="nama">Nama Lengkap</label>
+      <input type="text" id="nama" placeholder="cth. Siti Rahmawati" autocomplete="off" required>
+
+      <label for="nik">NIK</label>
+      <input type="text" id="nik" placeholder="cth. 3201xxxxxxxxxxx" autocomplete="off" required>
+
+      <label for="departemen">Departemen</label>
+      <select id="departemen" required>
+        <option value="" disabled selected>Pilih departemen</option>
+        <option>Produksi</option>
+        <option>Quality Control</option>
+        <option>Human Resources</option>
+        <option>Finance</option>
+        <option>IT</option>
+        <option>Marketing</option>
+        <option>Operasional</option>
+        <option>Lainnya</option>
+      </select>
+
+      <label for="trainer">Trainer</label>
+      <input type="text" id="trainer" placeholder="cth. Budi Santoso" autocomplete="off" required>
+
+      <label for="shift">Shift Kerja</label>
+      <select id="shift" required>
+        <option value="" disabled selected>Pilih shift</option>
+        <option value="Shift 1">Shift 1 (07:00 - 15:30)</option>
+        <option value="Shift 2">Shift 2 (15:00 - 23:30)</option>
+        <option value="Shift 3">Shift 3 (23:15 - 07:15)</option>
+      </select>
+
+      <label for="jamManual">Jam Kehadiran (Manual)</label>
+      <input type="time" id="jamManual" required>
+
+      <label>Paraf</label>
+      <div class="sign-box">
+        <canvas id="signPad"></canvas>
+      </div>
+      <div class="sign-tools">
+        <span class="sign-hint">Gambar paraf di kotak atas</span>
+        <button type="button" class="link-btn" id="clearSign">Hapus paraf</button>
+      </div>
+
+      <button type="submit" class="btn" id="submitBtn">Simpan Kehadiran</button>
+      <button type="button" class="btn secondary" id="cancelEdit" style="display:none;">Batalkan Edit</button>
+    </form>
+  </div>
+
+  <!-- MAIN -->
+  <div>
+    <div class="stats">
+      <div class="card stat">
+        <div class="label">Total Hadir Hari Ini</div>
+        <div class="value teal" id="statToday">0</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Total Semua Catatan</div>
+        <div class="value" id="statTotal">0</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Departemen Aktif</div>
+        <div class="value" id="statDept">0</div>
+      </div>
+    </div>
+
+    <div class="card table-card">
+      <div class="table-head">
+        <h2>Riwayat Kehadiran</h2>
+        <div class="controls">
+          <div class="search-wrap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchBox" placeholder="Cari nama / NIK...">
+          </div>
+          <select id="filterDept">
+            <option value="">Semua Departemen</option>
+          </select>
+          <button class="export-btn" id="exportBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Waktu Input</th>
+              <th>Jam Manual</th>
+              <th>Shift</th>
+              <th>Nama</th>
+              <th>NIK</th>
+              <th>Departemen</th>
+              <th>Trainer</th>
+              <th>Paraf</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyState">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-6 4h6M9 8h1M4 6a2 2 0 012-2h12a2 2 0 012 2v14l-4-3-3 3-3-3-3 3-3-3V6z"/></svg>
+        <p>Belum ada data kehadiran. Isi form di sebelah kiri untuk menambahkan.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>Data tersimpan otomatis di browser ini (localStorage).</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'absensi_records_v1';
+  let records = [];
+  let editId = null;
+
+  // ---------- Jadwal Shift Kerja (absensi dibuka 24 jam) ----------
+  const SHIFTS = {
+    'Shift 1': { start: '07:00', end: '15:30' },
+    'Shift 2': { start: '15:00', end: '23:30' },
+    'Shift 3': { start: '23:15', end: '07:15', overnight: true }
+  };
+  const LATE_GRACE_MINUTES = 15; // toleransi keterlambatan
+
+  function toMinutes(hhmm){
+    const [h,m] = hhmm.split(':').map(Number);
+    return h*60 + m;
+  }
+  function isLateForShift(shiftName, manualHHMM){
+    const shift = SHIFTS[shiftName];
+    if(!shift || !manualHHMM) return false;
+    const startMin = toMinutes(shift.start);
+    const manualMin = toMinutes(manualHHMM);
+    // selisih dibulatkan ke rentang -720..720 menit supaya "datang lebih awal"
+    // tidak dibaca sebagai "terlambat hampir 24 jam" akibat wrap tengah malam
+    let diff = (manualMin - startMin + 1440) % 1440;
+    if(diff > 720) diff -= 1440;
+    return diff > LATE_GRACE_MINUTES;
+  }
+  function suggestShiftForNow(){
+    const now = new Date();
+    const nowMin = now.getHours()*60 + now.getMinutes();
+    for(const name in SHIFTS){
+      const s = SHIFTS[name];
+      const startMin = toMinutes(s.start), endMin = toMinutes(s.end);
+      if(s.overnight){
+        if(nowMin >= startMin || nowMin < endMin) return name;
+      } else {
+        if(nowMin >= startMin && nowMin < endMin) return name;
+      }
+    }
+    return '';
+  }
+  function updateAttendanceWindowUI(){
+    const badge = document.getElementById('windowBadge');
+    const badgeText = document.getElementById('windowBadgeText');
+    badge.classList.remove('closed');
+    badgeText.textContent = 'Absensi Dibuka 24 Jam';
+  }
+
+  // ---------- Clock ----------
+  function pad(n){return n.toString().padStart(2,'0');}
+  function updateClock(){
+    const now = new Date();
+    document.getElementById('clockTime').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    document.getElementById('clockDate').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    updateAttendanceWindowUI();
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+
+  // ---------- Storage ----------
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      records = raw ? JSON.parse(raw) : [];
+      // hitung ulang status terlambat untuk data lama (memperbaiki bug perhitungan sebelumnya)
+      records.forEach(r=>{
+        if(r.shift && r.jamManual){
+          r.late = isLateForShift(r.shift, r.jamManual);
+        }
+      });
+      save();
+    }catch(e){ records = []; }
+  }
+  function save(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }catch(e){ showToast('Gagal menyimpan data', true); }
+  }
+
+  // ---------- Notifikasi Telegram ----------
+  const TG_KEY = 'absensi_telegram_config_v1';
+
+  function loadTgConfig(){
+    try{
+      const raw = localStorage.getItem(TG_KEY);
+      return raw ? JSON.parse(raw) : { token:'', chatId:'' };
+    }catch(e){ return { token:'', chatId:'' }; }
+  }
+  function saveTgConfig(cfg){
+    try{ localStorage.setItem(TG_KEY, JSON.stringify(cfg)); }catch(e){}
+  }
+
+  function sendTelegramMessage(text){
+    const cfg = loadTgConfig();
+    if(!cfg.token || !cfg.chatId) return Promise.resolve({ok:false, reason:'not_configured'});
+    const url = `https://api.telegram.org/bot${cfg.token}/sendMessage?chat_id=${encodeURIComponent(cfg.chatId)}&text=${encodeURIComponent(text)}`;
+    return fetch(url)
+      .then(res=>res.json())
+      .then(data=> data.ok ? {ok:true} : {ok:false, reason: data.description || 'unknown'})
+      .catch(()=> ({ok:false, reason:'network'}));
+  }
+
+  function buildAttendanceMessage(action, rec){
+    const emoji = action==='Baru' ? '\u{1F195}' : action==='Diperbarui' ? '\u270F\uFE0F' : '\u{1F5D1}\uFE0F';
+    const now = new Date();
+    const lines = [
+      `${emoji} Absensi ${action}`,
+      `\u{1F464} Nama: ${rec.nama}`,
+      `\u{1F194} NIK: ${rec.nik}`,
+      `\u{1F3E2} Departemen: ${rec.dept}`,
+      `\u{1F468}\u200D\u{1F3EB} Trainer: ${rec.trainer}`
+    ];
+    if(rec.shift) lines.push(`\u{1F550} Shift: ${rec.shift}`);
+    if(rec.jamManual) lines.push(`\u23F0 Jam Masuk: ${rec.jamManual}`);
+    if(rec.late !== undefined) lines.push(`\u{1F4CC} Status: ${rec.late ? 'Terlambat' : 'Tepat Waktu'}`);
+    lines.push(`\u{1F5D3}\uFE0F ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`);
+    return lines.join('\n');
+  }
+
+  function notifyTelegram(action, rec){
+    const cfg = loadTgConfig();
+    if(!cfg.token || !cfg.chatId) return; // belum dikonfigurasi, lewati diam-diam
+    sendTelegramMessage(buildAttendanceMessage(action, rec)).then(result=>{
+      if(!result.ok) console.warn('Notifikasi Telegram gagal:', result.reason);
+    });
+  }
+
+  // Modal pengaturan Telegram
+  const settingsModal = document.getElementById('settingsModal');
+  const tgTokenEl = document.getElementById('tgToken');
+  const tgChatIdEl = document.getElementById('tgChatId');
+  const tgStatusEl = document.getElementById('tgStatus');
+
+  function openSettingsModal(){
+    const cfg = loadTgConfig();
+    tgTokenEl.value = cfg.token || '';
+    tgChatIdEl.value = cfg.chatId || '';
+    tgStatusEl.textContent = '';
+    tgStatusEl.className = 'modal-status';
+    settingsModal.classList.add('show');
+  }
+  function closeSettingsModal(){ settingsModal.classList.remove('show'); }
+
+  document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
+  document.getElementById('tgCloseBtn').addEventListener('click', closeSettingsModal);
+  settingsModal.addEventListener('click', (e)=>{ if(e.target === settingsModal) closeSettingsModal(); });
+
+  document.getElementById('tgSaveBtn').addEventListener('click', ()=>{
+    const token = tgTokenEl.value.trim();
+    const chatId = tgChatIdEl.value.trim();
+    if(!token || !chatId){
+      tgStatusEl.textContent = 'Bot Token dan Chat ID wajib diisi';
+      tgStatusEl.className = 'modal-status err';
+      return;
+    }
+    saveTgConfig({token, chatId});
+    tgStatusEl.textContent = 'Pengaturan disimpan';
+    tgStatusEl.className = 'modal-status ok';
+    showToast('Pengaturan Telegram disimpan');
+  });
+
+  document.getElementById('tgTestBtn').addEventListener('click', ()=>{
+    const token = tgTokenEl.value.trim();
+    const chatId = tgChatIdEl.value.trim();
+    if(!token || !chatId){
+      tgStatusEl.textContent = 'Isi Bot Token dan Chat ID dulu';
+      tgStatusEl.className = 'modal-status err';
+      return;
+    }
+    saveTgConfig({token, chatId});
+    tgStatusEl.textContent = 'Mengirim pesan tes...';
+    tgStatusEl.className = 'modal-status';
+    const testText = `\u2705 Tes koneksi berhasil!\nAplikasi Absensi Kehadiran siap mengirim notifikasi ke chat ini.`;
+    sendTelegramMessage(testText).then(result=>{
+      if(result.ok){
+        tgStatusEl.textContent = 'Berhasil! Cek pesan di Telegram Anda.';
+        tgStatusEl.className = 'modal-status ok';
+      } else {
+        tgStatusEl.textContent = 'Gagal mengirim: ' + (result.reason==='network' ? 'periksa koneksi internet' : result.reason);
+        tgStatusEl.className = 'modal-status err';
+      }
+    });
+  });
+
+  // ---------- Signature pad ----------
+  const canvas = document.getElementById('signPad');
+  const ctx = canvas.getContext('2d');
+  let drawing = false, hasSignature = false;
+  let last = {x:0,y:0};
+
+  function resizeCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    const imgData = hasSignature ? canvas.toDataURL() : null;
+    canvas.width = rect.width * ratio;
+    canvas.height = 140 * ratio;
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#16304F';
+    if(imgData){
+      const img = new Image();
+      img.onload = ()=> ctx.drawImage(img,0,0,rect.width,140);
+      img.src = imgData;
+    }
+  }
+  window.addEventListener('resize', resizeCanvas);
+  setTimeout(resizeCanvas, 50);
+
+  function pos(e){
+    const rect = canvas.getBoundingClientRect();
+    if(e.touches && e.touches[0]){
+      return {x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top};
+    }
+    return {x: e.clientX - rect.left, y: e.clientY - rect.top};
+  }
+  function start(e){
+    e.preventDefault();
+    drawing = true;
+    last = pos(e);
+  }
+  function move(e){
+    if(!drawing) return;
+    e.preventDefault();
+    const p = pos(e);
+    ctx.beginPath();
+    ctx.moveTo(last.x, last.y);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    last = p;
+    hasSignature = true;
+  }
+  function end(){ drawing = false; }
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, {passive:false});
+  canvas.addEventListener('touchmove', move, {passive:false});
+  canvas.addEventListener('touchend', end);
+
+  document.getElementById('clearSign').addEventListener('click', ()=>{
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    hasSignature = false;
+  });
+
+  function getSignatureData(){
+    return hasSignature ? canvas.toDataURL('image/png') : '';
+  }
+  function setSignatureData(dataUrl){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    hasSignature = false;
+    if(dataUrl){
+      const img = new Image();
+      img.onload = ()=>{
+        const rect = canvas.getBoundingClientRect();
+        ctx.drawImage(img,0,0,rect.width,140);
+        hasSignature = true;
+      };
+      img.src = dataUrl;
+    }
+  }
+
+  // ---------- Toast ----------
+  let toastTimer;
+  function showToast(msg, isErr){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (isErr ? ' err' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.className = 'toast', 2200);
+  }
+
+  // ---------- Form ----------
+  const form = document.getElementById('absenForm');
+  const namaEl = document.getElementById('nama');
+  const nikEl = document.getElementById('nik');
+  const deptEl = document.getElementById('departemen');
+  const trainerEl = document.getElementById('trainer');
+  const shiftEl = document.getElementById('shift');
+  const jamManualEl = document.getElementById('jamManual');
+  const submitBtn = document.getElementById('submitBtn');
+  const cancelBtn = document.getElementById('cancelEdit');
+  const formTitle = document.getElementById('formTitle');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    const nama = namaEl.value.trim();
+    const nik = nikEl.value.trim();
+    const dept = deptEl.value;
+    const trainer = trainerEl.value.trim();
+    const shift = shiftEl.value;
+    const jamManual = jamManualEl.value;
+
+    if(!nama || !nik || !dept || !trainer || !shift || !jamManual){
+      showToast('Mohon lengkapi semua kolom', true);
+      return;
+    }
+
+    const now = new Date();
+    const isLate = isLateForShift(shift, jamManual);
+
+    if(editId){
+      const rec = records.find(r=>r.id===editId);
+      if(rec){
+        rec.nama=nama; rec.nik=nik; rec.dept=dept; rec.trainer=trainer;
+        rec.shift = shift;
+        rec.jamManual = jamManual;
+        rec.late = isLate;
+        rec.paraf = getSignatureData() || rec.paraf;
+        notifyTelegram('Diperbarui', rec);
+      }
+      showToast('Data berhasil diperbarui');
+      editId = null;
+      submitBtn.textContent = 'Simpan Kehadiran';
+      cancelBtn.style.display = 'none';
+      formTitle.textContent = 'Isi Kehadiran';
+    } else {
+      const newRec = {
+        id: 'r'+Date.now()+Math.random().toString(36).slice(2,6),
+        nama, nik, dept, trainer,
+        shift,
+        jamManual,
+        paraf: getSignatureData(),
+        time: now.toISOString(),
+        late: isLate
+      };
+      records.unshift(newRec);
+      notifyTelegram('Baru', newRec);
+      showToast('Kehadiran berhasil disimpan');
+    }
+
+    save();
+    render();
+    form.reset();
+    setSignatureData('');
+    setDefaultJamManual();
+  });
+
+  cancelBtn.addEventListener('click', ()=>{
+    editId = null;
+    form.reset();
+    setSignatureData('');
+    setDefaultJamManual();
+    submitBtn.textContent = 'Simpan Kehadiran';
+    cancelBtn.style.display = 'none';
+    formTitle.textContent = 'Isi Kehadiran';
+  });
+
+  function setDefaultJamManual(){
+    const now = new Date();
+    jamManualEl.value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const suggested = suggestShiftForNow();
+    if(suggested) shiftEl.value = suggested;
+  }
+  setDefaultJamManual();
+
+  window.editRecord = function(id){
+    const rec = records.find(r=>r.id===id);
+    if(!rec) return;
+    namaEl.value = rec.nama;
+    nikEl.value = rec.nik;
+    deptEl.value = rec.dept;
+    trainerEl.value = rec.trainer;
+    shiftEl.value = rec.shift || '';
+    jamManualEl.value = rec.jamManual || '';
+    setSignatureData(rec.paraf);
+    editId = id;
+    submitBtn.textContent = 'Perbarui Kehadiran';
+    cancelBtn.style.display = 'block';
+    formTitle.textContent = 'Edit Kehadiran';
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
+
+  window.deleteRecord = function(id){
+    if(!confirm('Hapus catatan kehadiran ini?')) return;
+    const rec = records.find(r=>r.id===id);
+    records = records.filter(r=>r.id!==id);
+    save();
+    render();
+    if(rec) notifyTelegram('Dihapus', rec);
+    showToast('Catatan dihapus');
+  };
+
+  // ---------- Search / filter ----------
+  const searchBox = document.getElementById('searchBox');
+  const filterDept = document.getElementById('filterDept');
+  searchBox.addEventListener('input', render);
+  filterDept.addEventListener('change', render);
+
+  // ---------- Export CSV ----------
+  document.getElementById('exportBtn').addEventListener('click', ()=>{
+    if(records.length===0){ showToast('Tidak ada data untuk diexport', true); return; }
+    const header = ['Waktu Input','Jam Manual','Shift','Nama','NIK','Departemen','Trainer','Status'];
+    const rows = records.map(r=>{
+      const d = new Date(r.time);
+      const waktu = `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      return [waktu, r.jamManual || '-', r.shift || '-', r.nama, r.nik, r.dept, r.trainer, r.late?'Terlambat':'Tepat Waktu']
+        .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
+    });
+    const csv = [header.join(','), ...rows].join('\n');
+    const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `absensi_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV berhasil diunduh');
+  });
+
+  // ---------- Render ----------
+  function fmtTime(iso){
+    const d = new Date(iso);
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function render(){
+    // populate dept filter
+    const depts = [...new Set(records.map(r=>r.dept))].sort();
+    const currentFilter = filterDept.value;
+    filterDept.innerHTML = '<option value="">Semua Departemen</option>' +
+      depts.map(d=>`<option value="${d}">${d}</option>`).join('');
+    filterDept.value = depts.includes(currentFilter) ? currentFilter : '';
+
+    const q = searchBox.value.trim().toLowerCase();
+    const fDept = filterDept.value;
+
+    let filtered = records.filter(r=>{
+      const matchQ = !q || r.nama.toLowerCase().includes(q) || r.nik.toLowerCase().includes(q);
+      const matchD = !fDept || r.dept === fDept;
+      return matchQ && matchD;
+    });
+
+    const tbody = document.getElementById('tableBody');
+    const emptyState = document.getElementById('emptyState');
+
+    if(filtered.length === 0){
+      tbody.innerHTML = '';
+      emptyState.style.display = 'block';
+    } else {
+      emptyState.style.display = 'none';
+      tbody.innerHTML = filtered.map(r=>`
+        <tr>
+          <td>${fmtTime(r.time)}</td>
+          <td><strong>${escapeHtml(r.jamManual || '-')}</strong></td>
+          <td><span class="dept-pill" style="background:#EAF7F1;color:#166847;">${escapeHtml(r.shift || '-')}</span></td>
+          <td><strong>${escapeHtml(r.nama)}</strong></td>
+          <td class="nik-cell">${escapeHtml(r.nik)}</td>
+          <td><span class="dept-pill">${escapeHtml(r.dept)}</span></td>
+          <td>${escapeHtml(r.trainer)}</td>
+          <td>${r.paraf ? `<img class="paraf-img" src="${r.paraf}" alt="paraf">` : '<span class="paraf-empty">belum ada</span>'}</td>
+          <td><span class="status-pill ${r.late?'late':''}">${r.late?'Terlambat':'Tepat Waktu'}</span></td>
+          <td>
+            <div class="row-actions">
+              <button class="icon-btn" onclick="editRecord('${r.id}')" title="Edit">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+              </button>
+              <button class="icon-btn del" onclick="deleteRecord('${r.id}')" title="Hapus">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // stats
+    const todayStr = new Date().toDateString();
+    const todayCount = records.filter(r=> new Date(r.time).toDateString() === todayStr).length;
+    document.getElementById('statToday').textContent = todayCount;
+    document.getElementById('statTotal').textContent = records.length;
+    document.getElementById('statDept').textContent = depts.length;
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  load();
+  render();
+})();
+</script>
+</body>
+</html>
